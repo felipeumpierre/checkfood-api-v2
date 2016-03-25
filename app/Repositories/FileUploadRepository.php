@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Models\ProductIngredient;
+use App\Models\FileUpload;
 use Housekeeper\Repository;
 use Housekeeper\Action;
 
-class ProductIngredientRepository extends Repository
+class FileUploadRepository extends Repository
 {
     /**
      * Return the name of model that this repository used.
@@ -15,7 +15,7 @@ class ProductIngredientRepository extends Repository
      */
     protected function model()
     {
-        return ProductIngredient::class;
+        return FileUpload::class;
     }
 
     /**

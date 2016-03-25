@@ -2,11 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Models\ProductIngredient;
 use Housekeeper\Repository;
 use Housekeeper\Action;
 
-class ProductIngredientRepository extends Repository
+class BoardRepository extends Repository
 {
     /**
      * Return the name of model that this repository used.
@@ -15,7 +14,7 @@ class ProductIngredientRepository extends Repository
      */
     protected function model()
     {
-        return ProductIngredient::class;
+        return \App\Models\Board::class;
     }
 
     /**
