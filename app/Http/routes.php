@@ -12,12 +12,14 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return 'Welcome to Checkfood API V2';
 });
 
 Route::group(['prefix' => 'api', 'middleware' => ['api']], function () {
     Route::group(['prefix' => 'menu'], function () {
-        Route::get('/', 'MenuController@list')->name('_get_menu');
+        Route::get('/', 'MenuController@menu')->name('_get_menu');
+        Route::get('/grouped/{option}', 'MenuController@grouped')->name('_get_menu_grouped');
+        Route::get('/products/category/{categoryId}', 'MenuController@category')->name('_get_menu_by_category');
     });
 
     Route::group(['prefix' => 'category'], function () {
