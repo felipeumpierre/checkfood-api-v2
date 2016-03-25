@@ -18,12 +18,17 @@ class Product extends Model
         'stock',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function category()
     {
-        return $this->belongsTo(Category::class, 'id', 'categories_id');
+        return $this->belongsTo(Category::class, 'categories_id', 'id')->select('name');
     }
 
     /**
@@ -39,6 +44,6 @@ class Product extends Model
      */
     public function ingredients()
     {
-        return $this->belongsToMany(Ingredient::class, 'products_ingredients', 'products_id', 'ingredients_id');
+        return $this->belongsToMany(Ingredient::class, 'products_ingredients', 'products_id', 'ingredients_id')->select('name');
     }
 }

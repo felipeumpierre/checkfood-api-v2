@@ -12,4 +12,20 @@ class Category extends Model
     protected $fillable = [
         'name',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'categories_id', 'id');
+    }
+
+    /**
+     * @return int
+     */
+    public function totalProducts()
+    {
+        $this->attributes['total_products'] = count($this->products()->getResults());
+    }
 }
