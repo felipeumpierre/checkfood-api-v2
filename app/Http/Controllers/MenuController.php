@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\NotFoundRecordException;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 use App\Http\Requests;
@@ -18,6 +17,8 @@ class MenuController extends Controller
     ];
 
     /**
+     * Show all the products with category and ingredients
+     *
      * @param ProductRepository $productRepository
      * @return string
      */
@@ -25,14 +26,14 @@ class MenuController extends Controller
     {
         $products = $productRepository->with([
             'category',
-            'ingredients'
+            'ingredients',
         ])->all();
 
         return Response::json($products);
     }
 
     /**
-     * Return the menu grouped by option selected
+     * Show the menu grouped by option selected
      *
      * @param string $option
      * @param CategoryRepository $categoryRepository
@@ -41,39 +42,44 @@ class MenuController extends Controller
     public function grouped($option, CategoryRepository $categoryRepository)
     {
         if (!in_array($option, $this->groupedOptions)) {
-            throw new \InvalidArgumentException('Option not supported.');
+            return Response::json([
+                'message' => 'Option not supported.',
+                'error' => 'OPTION_INVALID',
+            ]);
         }
 
         $categories = $categoryRepository->with([
             'products'
         ])->all([
             'id',
-            'name'
+            'name',
         ]);
 
         return Response::json($categories);
     }
 
     /**
-     * Return just the products from a category
+     * Show just the products from a category
      *
      * @param int $category
      * @param CategoryRepository $categoryRepository
      * @param ProductRepository $productRepository
      * @return string
-     * @throws NotFoundRecordException
      */
     public function category($category, CategoryRepository $categoryRepository, ProductRepository $productRepository)
     {
-        if (! $categoryRepository->find($category)->exists) {
-            throw new NotFoundRecordException('This category not exist');
+        if (!$categoryRepository->exists($category)) {
+            return Response::json([
+                'message' => 'This category not exist.',
+                'error' => 'NO_RECORD_FOUND',
+            ]);
         }
 
         return Response::json($productRepository->findByField('categories_id', $category)->all([
             'id',
             'name',
             'description',
-            'price'
+            'price',
         ]));
     }
 }
