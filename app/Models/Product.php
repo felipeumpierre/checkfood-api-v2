@@ -18,6 +18,9 @@ class Product extends Model
         'stock',
     ];
 
+    /**
+     * @var array
+     */
     protected $hidden = [
         'created_at',
         'updated_at',
