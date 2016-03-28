@@ -69,8 +69,36 @@ class BoardController extends Controller
         return Response::json($return);
     }
 
+    /**
+     * Function to set a table as opened
+     *
+     * @param int $boardId
+     * @param BoardRepository $boardRepository
+     * @return string
+     */
     public function close($boardId, BoardRepository $boardRepository)
     {
+        $this->boardExists($boardId, $boardRepository);
 
+        // Check if the board is closed
+        if ($this->isClosed($this->board->status_id)) {
+            try {
+                $return = $boardRepository->update($boardId, [
+                    'status_id' => 1
+                ]);
+            } catch (\Exception $e) {
+                $return = [
+                    'message' => 'An error happened.',
+                    'error' => 'UNEXPECTED_ERROR',
+                ];
+            }
+        } else {
+            $return = [
+                'message' => 'This board is already closed',
+                'error' => 'ALREADY_CLOSED',
+            ];
+        }
+
+        return Response::json($return);
     }
 }
