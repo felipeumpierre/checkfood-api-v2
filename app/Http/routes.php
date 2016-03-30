@@ -41,7 +41,7 @@ Route::group(['prefix' => 'api', 'middleware' => ['api']], function () {
         Route::get('/{id}/open', 'BoardController@open')->name('_open_board');
         Route::get('/{id}/close', 'BoardController@close')->name('_close_board');
     });
-
+    
     Route::group(['prefix' => 'checkout'], function () {
         Route::get('/board/{id}', 'CheckoutController@board')->name('_get_checkout_board');
         Route::post('/board/{id}', 'CheckoutController@request')->name('_request_checkout_board');

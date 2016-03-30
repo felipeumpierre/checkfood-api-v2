@@ -20,8 +20,8 @@ class BoardController extends Controller
     /**
      * Validation to check if the board exists
      *
-     * @param int $boardId
-     * @param BoardRepository $boardRepository
+     * @param  integer $boardId
+     * @param  BoardRepository $boardRepository
      * @return string
      */
     private function boardExists($boardId, BoardRepository $boardRepository)
@@ -39,8 +39,8 @@ class BoardController extends Controller
     /**
      * Function to set a table as used
      *
-     * @param int $boardId
-     * @param BoardRepository $boardRepository
+     * @param  integer $boardId
+     * @param  BoardRepository $boardRepository
      * @return string
      */
     public function open($boardId, BoardRepository $boardRepository)
@@ -72,8 +72,8 @@ class BoardController extends Controller
     /**
      * Function to set a table as opened
      *
-     * @param int $boardId
-     * @param BoardRepository $boardRepository
+     * @param  integer $boardId
+     * @param  BoardRepository $boardRepository
      * @return string
      */
     public function close($boardId, BoardRepository $boardRepository)

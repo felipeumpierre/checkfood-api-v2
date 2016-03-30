@@ -12,7 +12,7 @@ class OpinionController extends Controller
     /**
      * Show all the opinions
      *
-     * @param OpinionRepository $opinionRepository
+     * @param  OpinionRepository $opinionRepository
      * @return string
      */
     public function index(OpinionRepository $opinionRepository)
@@ -23,8 +23,8 @@ class OpinionController extends Controller
     /**
      * Insert a new opinion
      *
-     * @param Request $request
-     * @param OpinionRepository $opinionRepository
+     * @param  Request $request
+     * @param  OpinionRepository $opinionRepository
      * @return string
      */
     public function create(Request $request, OpinionRepository $opinionRepository)

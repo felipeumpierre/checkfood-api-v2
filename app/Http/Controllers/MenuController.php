@@ -19,7 +19,7 @@ class MenuController extends Controller
     /**
      * Show all the products with category and ingredients
      *
-     * @param ProductRepository $productRepository
+     * @param  ProductRepository $productRepository
      * @return string
      */
     public function menu(ProductRepository $productRepository)
@@ -35,8 +35,8 @@ class MenuController extends Controller
     /**
      * Show the menu grouped by option selected
      *
-     * @param string $option
-     * @param CategoryRepository $categoryRepository
+     * @param  string $option
+     * @param  CategoryRepository $categoryRepository
      * @return string
      */
     public function grouped($option, CategoryRepository $categoryRepository)
@@ -61,9 +61,9 @@ class MenuController extends Controller
     /**
      * Show just the products from a category
      *
-     * @param int $category
-     * @param CategoryRepository $categoryRepository
-     * @param ProductRepository $productRepository
+     * @param  integer $category
+     * @param  CategoryRepository $categoryRepository
+     * @param  ProductRepository $productRepository
      * @return string
      */
     public function category($category, CategoryRepository $categoryRepository, ProductRepository $productRepository)
