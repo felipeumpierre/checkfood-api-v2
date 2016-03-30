@@ -11,8 +11,8 @@ class CategoryController extends Controller
     /**
      * Show all the categories, just `id` and `name`
      *
-     * @param CategoryRepository $categoryRepository
-     * @return mixed
+     * @param  CategoryRepository $categoryRepository
+     * @return string
      */
     public function index(CategoryRepository $categoryRepository)
     {
@@ -22,9 +22,9 @@ class CategoryController extends Controller
     /**
      * Show all the details from one category, with the total of products in that category
      *
-     * @param int $categoryId
-     * @param CategoryRepository $categoryRepository
-     * @return mixed
+     * @param  integer $categoryId
+     * @param  CategoryRepository $categoryRepository
+     * @return string
      */
     public function show($categoryId, CategoryRepository $categoryRepository)
     {
@@ -32,5 +32,24 @@ class CategoryController extends Controller
         $category->totalProducts();
 
         return Response::json($category);
+    }
+
+    /**
+     * @param  CategoryRepository $categoryRepository
+     * @return string
+     */
+    public function add(CategoryRepository $categoryRepository)
+    {
+        // TODO: insert category
+    }
+
+    /**
+     * @param  integer $id
+     * @param  CategoryRepository $categoryRepository
+     * @return string
+     */
+    public function edit($id, CategoryRepository $categoryRepository)
+    {
+        // TODO: edit category
     }
 }
