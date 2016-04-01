@@ -57,6 +57,8 @@ class CategoryController extends Controller
     }
 
     /**
+     * Edit a category
+     *
      * @param  integer $id
      * @param  Request $request
      * @param  CategoryRepository $categoryRepository
