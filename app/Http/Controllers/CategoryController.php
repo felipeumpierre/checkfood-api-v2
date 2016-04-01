@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Repositories\CategoryRepository;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -35,21 +36,50 @@ class CategoryController extends Controller
     }
 
     /**
+     * Create a new category
+     *
+     * @param  Request $request
      * @param  CategoryRepository $categoryRepository
      * @return string
      */
-    public function add(CategoryRepository $categoryRepository)
+    public function add(Request $request, CategoryRepository $categoryRepository)
     {
-        // TODO: insert category
+        try {
+            $response = $categoryRepository->create($request->all());
+        } catch (\Exception $e) {
+            $response = [
+                'message' => 'An error happened.',
+                'error' => 'UNEXPECTED_ERROR',
+            ];
+        }
+
+        return Response::json($response);
     }
 
     /**
      * @param  integer $id
+     * @param  Request $request
      * @param  CategoryRepository $categoryRepository
      * @return string
      */
-    public function edit($id, CategoryRepository $categoryRepository)
+    public function edit($id, Request $request, CategoryRepository $categoryRepository)
     {
-        // TODO: edit category
+        try {
+            if ($categoryRepository->exists($id)) {
+                $response = $categoryRepository->update($id, $request->all());
+            } else {
+                $response = [
+                    'message' => 'This category not exist.',
+                    'error' => 'NO_RECORD_FOUND',
+                ];
+            }
+        } catch (\Exception $e) {
+            $response = [
+                'message' => 'An error happened.',
+                'error' => 'UNEXPECTED_ERROR',
+            ];
+        }
+
+        return Response::json($response);
     }
 }
