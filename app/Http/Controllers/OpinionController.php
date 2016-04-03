@@ -17,7 +17,7 @@ class OpinionController extends Controller
      */
     public function index(OpinionRepository $opinionRepository)
     {
-        return Response::json($opinionRepository->all());
+        return response()->json($opinionRepository->all());
     }
 
     /**
@@ -38,6 +38,6 @@ class OpinionController extends Controller
             ];
         }
 
-        return Response::json($response);
+        return response()->json($response);
     }
 }

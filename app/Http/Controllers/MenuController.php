@@ -29,7 +29,7 @@ class MenuController extends Controller
             'ingredients',
         ])->all();
 
-        return Response::json($products);
+        return response()->json($products);
     }
 
     /**
@@ -42,7 +42,7 @@ class MenuController extends Controller
     public function grouped($option, CategoryRepository $categoryRepository)
     {
         if (!in_array($option, $this->groupedOptions)) {
-            return Response::json([
+            return response()->json([
                 'message' => 'Option not supported.',
                 'error' => 'OPTION_INVALID',
             ]);
@@ -55,7 +55,7 @@ class MenuController extends Controller
             'name',
         ]);
 
-        return Response::json($categories);
+        return response()->json($categories);
     }
 
     /**
@@ -69,13 +69,13 @@ class MenuController extends Controller
     public function category($category, CategoryRepository $categoryRepository, ProductRepository $productRepository)
     {
         if (!$categoryRepository->exists($category)) {
-            return Response::json([
+            return response()->json([
                 'message' => 'This category not exist.',
                 'error' => 'NO_RECORD_FOUND',
             ]);
         }
 
-        return Response::json($productRepository->findByField('categories_id', $category)->all([
+        return response()->json($productRepository->findByField('categories_id', $category)->all([
             'id',
             'name',
             'description',

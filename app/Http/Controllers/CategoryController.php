@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Repositories\CategoryRepository;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -17,7 +16,7 @@ class CategoryController extends Controller
      */
     public function index(CategoryRepository $categoryRepository)
     {
-        return Response::json($categoryRepository->all(['id', 'name']));
+        return response()->json($categoryRepository->all(['id', 'name']));
     }
 
     /**
@@ -32,7 +31,7 @@ class CategoryController extends Controller
         $category = $categoryRepository->find($categoryId);
         $category->totalProducts();
 
-        return Response::json($category);
+        return response()->json($category);
     }
 
     /**
@@ -53,7 +52,7 @@ class CategoryController extends Controller
             ];
         }
 
-        return Response::json($response);
+        return response()->json($response);
     }
 
     /**
@@ -82,6 +81,6 @@ class CategoryController extends Controller
             ];
         }
 
-        return Response::json($response);
+        return response()->json($response);
     }
 }

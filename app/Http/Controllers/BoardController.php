@@ -27,7 +27,7 @@ class BoardController extends Controller
     private function boardExists($boardId, BoardRepository $boardRepository)
     {
         if (!$boardRepository->exists($boardId)) {
-            return Response::json([
+            return response()->json([
                 'message' => 'This board not exists.',
                 'error' => 'NO_RECORD_FOUND',
             ]);
@@ -66,7 +66,7 @@ class BoardController extends Controller
             ];
         }
 
-        return Response::json($return);
+        return response()->json($return);
     }
 
     /**
@@ -99,6 +99,6 @@ class BoardController extends Controller
             ];
         }
 
-        return Response::json($return);
+        return response()->json($return);
     }
 }
