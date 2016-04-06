@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 use App\Http\Requests;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 
 class MenuController extends Controller
@@ -17,69 +19,113 @@ class MenuController extends Controller
     ];
 
     /**
+     * @var ProductRepository
+     */
+    protected $productRepository;
+
+    /**
+     * @var CategoryRepository
+     */
+    protected $categoryRepository;
+
+    /**
+     * @param CategoryRepository $categoryRepository
+     * @param ProductRepository $productRepository
+     */
+    public function __construct(CategoryRepository $categoryRepository, ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
+        $this->categoryRepository = $categoryRepository;
+    }
+
+    /**
      * Show all the products with category and ingredients
      *
-     * @param  ProductRepository $productRepository
      * @return string
      */
-    public function menu(ProductRepository $productRepository)
+    public function menu()
     {
-        $products = $productRepository->with([
-            'category',
-            'ingredients',
-        ])->all();
+        $products = Cache::remember(
+            'products.completed',
+            Config::get('checkfood.cache.main'),
+            function () {
+                return $this->productRepository->with([
+                    'category',
+                    'ingredients',
+                ])->all();
+            }
+        );
 
-        return response()->json($products);
+        return Response::json($products, 200);
     }
 
     /**
      * Show the menu grouped by option selected
      *
      * @param  string $option
-     * @param  CategoryRepository $categoryRepository
      * @return string
      */
-    public function grouped($option, CategoryRepository $categoryRepository)
+    public function grouped($option)
     {
         if (!in_array($option, $this->groupedOptions)) {
-            return response()->json([
+            return Response::json([
                 'message' => 'Option not supported.',
                 'error' => 'OPTION_INVALID',
-            ]);
+            ], 400);
         }
 
-        $categories = $categoryRepository->with([
-            'products'
-        ])->all([
-            'id',
-            'name',
-        ]);
+        $categories = Cache::remember(
+            sprintf('category.grouped.%s', $option),
+            Config::get('checkfood.cache.main'),
+            function () {
+                return $this->categoryRepository->with([
+                    'products'
+                ])->all([
+                    'id',
+                    'name',
+                ]);
+            }
+        );
 
-        return response()->json($categories);
+        return Response::json($categories, 200);
     }
 
     /**
      * Show just the products from a category
      *
-     * @param  integer $category
-     * @param  CategoryRepository $categoryRepository
-     * @param  ProductRepository $productRepository
+     * @param  integer $id
      * @return string
      */
-    public function category($category, CategoryRepository $categoryRepository, ProductRepository $productRepository)
+    public function category($id)
     {
-        if (!$categoryRepository->exists($category)) {
-            return response()->json([
+        $exists = Cache::remember(
+            sprintf('category.%d', $id),
+            Config::get('checkfood.cache.main'),
+            function () use ($id) {
+                return $this->categoryRepository->exists($id);
+            }
+        );
+
+        if (!$exists) {
+            return Response::json([
                 'message' => 'This category not exist.',
                 'error' => 'NO_RECORD_FOUND',
-            ]);
+            ], 400);
         }
 
-        return response()->json($productRepository->findByField('categories_id', $category)->all([
-            'id',
-            'name',
-            'description',
-            'price',
-        ]));
+        $products = Cache::remember(
+            sprintf('category.%d.products', $id),
+            Config::get('checkfood.cache.main'),
+            function () use ($id) {
+                return $this->productRepository->findByField('categories_id', $id)->all([
+                    'id',
+                    'name',
+                    'description',
+                    'price',
+                ]);
+            }
+        );
+
+        return Response::json($products, 200);
     }
 }
