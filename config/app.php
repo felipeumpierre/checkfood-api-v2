@@ -159,6 +159,8 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Housekeeper\Providers\HousekeeperServiceProvider::class,
 
+        Dingo\Api\Provider\LaravelServiceProvider::class
+
     ],
 
     /*

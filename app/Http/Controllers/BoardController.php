@@ -2,103 +2,80 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Board;
 use App\Repositories\BoardRepository;
 use App\Http\Requests;
-use Illuminate\Support\Facades\Response;
-use Services\Traits\StatusTrait;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 
 class BoardController extends Controller
 {
-    use StatusTrait;
+    /**
+     * @var BoardRepository
+     */
+    protected $boardRepository;
 
     /**
-     * @var Board
+     * @param BoardRepository $boardRepository
      */
-    private $board;
+    public function __construct(BoardRepository $boardRepository)
+    {
+        $this->boardRepository = $boardRepository;
+    }
 
     /**
      * Validation to check if the board exists
      *
-     * @param  integer $boardId
-     * @param  BoardRepository $boardRepository
+     * @param  integer $id
      * @return string
      */
-    private function boardExists($boardId, BoardRepository $boardRepository)
+    protected function boardExists($id)
     {
-        if (!$boardRepository->exists($boardId)) {
-            return response()->json([
-                'message' => 'This board not exists.',
-                'error' => 'NO_RECORD_FOUND',
-            ]);
-        }
+        $exists = Cache::remember(sprintf('board.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            return $this->boardRepository->exists($id);
+        });
 
-        $this->board = $boardRepository->find($boardId);
+        if (!$exists) {
+            $this->response()->errorNotFound('This board not exists');
+        }
     }
 
     /**
      * Function to set a table as used
      *
-     * @param  integer $boardId
-     * @param  BoardRepository $boardRepository
+     * @param  integer $id
      * @return string
      */
-    public function open($boardId, BoardRepository $boardRepository)
+    public function open($id)
     {
-        $this->boardExists($boardId, $boardRepository);
-
-        // Check if the board is open
-        if ($this->isOpen($this->board->status_id)) {
-            try {
-                $return = $boardRepository->update($boardId, [
-                    'status_id' => 2
-                ]);
-            } catch (\Exception $e) {
-                $return = [
-                    'message' => 'An error happened.',
-                    'error' => 'UNEXPECTED_ERROR',
-                ];
-            }
-        } else {
-            $return = [
-                'message' => 'This board is already open',
-                'error' => 'ALREADY_OPEN',
-            ];
-        }
-
-        return response()->json($return);
+        $this->handle($id, 2);
     }
 
     /**
      * Function to set a table as opened
      *
-     * @param  integer $boardId
-     * @param  BoardRepository $boardRepository
+     * @param  integer $id
      * @return string
      */
-    public function close($boardId, BoardRepository $boardRepository)
+    public function close($id)
     {
-        $this->boardExists($boardId, $boardRepository);
+        $this->handle($id, 1);
+    }
 
-        // Check if the board is closed
-        if ($this->isClosed($this->board->status_id)) {
-            try {
-                $return = $boardRepository->update($boardId, [
-                    'status_id' => 1
-                ]);
-            } catch (\Exception $e) {
-                $return = [
-                    'message' => 'An error happened.',
-                    'error' => 'UNEXPECTED_ERROR',
-                ];
-            }
-        } else {
-            $return = [
-                'message' => 'This board is already closed',
-                'error' => 'ALREADY_CLOSED',
-            ];
+    /**
+     * @param  integer $id
+     * @param  integer $status
+     * @return mixed
+     */
+    protected function handle($id, $status)
+    {
+        $this->boardExists($id);
+
+        try {
+            return $this->boardRepository->update($id, [
+                'status_id' => $status
+            ]);
+        } catch (\Exception $e) {
+            $this->response()->errorInternal($e->getMessage());
         }
-
-        return response()->json($return);
     }
 }

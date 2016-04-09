@@ -4,34 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Repositories\ProductRepository;
 use App\Http\Requests;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Response;
 
 class ProductController extends Controller
 {
+    protected $productRepository;
+
+    public function __construct(ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
+    }
+
     /**
      * Show the products with category
      *
-     * @param  ProductRepository $productRepository
      * @return string
      */
-    public function index(ProductRepository $productRepository)
+    public function index()
     {
-        $products = $productRepository->with(['category'])->all();
-
-        return Response::json($products);
+        return Cache::remember('product', Config::get('checkfood.cache.main'), function () {
+            return $this->productRepository->with([
+                'category'
+            ])->all();
+        });
     }
 
     /**
+     *
+     *
      * @param  integer $id
-     * @param  ProductRepository $productRepository
      * @return string
      */
-    public function show($id, ProductRepository $productRepository)
+    public function show($id)
     {
-        return Response::json($productRepository->with(['category'])->find($id));
+        return Cache::remember(sprintf('product.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            return $this->productRepository->with(['category'])->find($id);
+        });
     }
 
     /**
+     * 
+     *
      * @param  ProductRepository $productRepository
      * @return string
      */
