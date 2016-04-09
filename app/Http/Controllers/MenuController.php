@@ -83,7 +83,7 @@ class MenuController extends Controller
      */
     public function category($id)
     {
-        $exists = Cache::remember(sprintf('category.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+        $exists = Cache::remember(sprintf('category.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
             return $this->categoryRepository->exists($id);
         });
 
@@ -91,7 +91,7 @@ class MenuController extends Controller
             $this->response()->errorNotFound('This category not exist');
         }
 
-        return Cache::remember(sprintf('category.%d.products', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+        return Cache::remember(sprintf('category.%d.product', $id), Config::get('checkfood.cache.main'), function () use ($id) {
             return $this->productRepository->findByField('categories_id', $id)->all([
                 'id',
                 'name',

@@ -42,6 +42,11 @@ $api->version('v2', function ($api) {
             'as' => 'product.show',
             'uses' => 'App\Http\Controllers\ProductController@show',
         ]);
+
+        $api->get('/{id}/ingredients', [
+            'as' => 'product.ingredient',
+            'uses' => 'App\Http\Controllers\ProductController@ingredients',
+        ]);
     });
 
     $api->group(['prefix' => 'board'], function ($api) {
@@ -100,6 +105,7 @@ app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('opinion.index');
 
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.index');
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.show', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.ingredient', ['id']);
 
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.open', ['id']);
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.close', ['id']);
