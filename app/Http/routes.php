@@ -1,50 +1,119 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Routes File
-|--------------------------------------------------------------------------
-|
-| Here is where you will register all of the routes in an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-|
-*/
 
-Route::get('/', function () {
-    return 'Welcome to Checkfood API V2';
+$api = app('Dingo\Api\Routing\Router');
+$api->version('v2', function ($api) {
+
+    $api->get('/', function () {
+        return 'Welcome to Checkfood API V2';
+    });
+
+    $api->group(['prefix' => 'category'], function ($api) {
+        $api->get('/', [
+            'as' => 'category.index',
+            'uses' => 'App\Http\Controllers\CategoryController@index',
+        ]);
+
+        $api->get('/{id}', [
+            'as' => 'category.show',
+            'uses' => 'App\Http\Controllers\CategoryController@show',
+        ]);
+    });
+
+    $api->group(['prefix' => 'opinion'], function ($api) {
+        $api->get('/', [
+            'as' => 'opinion.index',
+            'uses' => 'App\Http\Controllers\OpinionController@index',
+        ]);
+
+        $api->post('/', [
+            'as' => 'opinion.index',
+            'uses' => 'App\Http\Controllers\OpinionController@create',
+        ]);
+    });
+
+    $api->group(['prefix' => 'product'], function ($api) {
+        $api->get('/', [
+            'as' => 'product.index',
+            'uses' => 'App\Http\Controllers\ProductController@index',
+        ]);
+
+        $api->get('/{id}', [
+            'as' => 'product.show',
+            'uses' => 'App\Http\Controllers\ProductController@show',
+        ]);
+
+        $api->get('/{id}/ingredients', [
+            'as' => 'product.ingredient',
+            'uses' => 'App\Http\Controllers\ProductController@ingredients',
+        ]);
+    });
+
+    $api->group(['prefix' => 'board'], function ($api) {
+        $api->get('/{id}/open', [
+            'as' => 'board.open',
+            'uses' => 'App\Http\Controllers\BoardController@open',
+        ]);
+
+        $api->get('/{id}/close', [
+            'as' => 'board.close',
+            'uses' => 'App\Http\Controllers\BoardController@close',
+        ]);
+    });
+
+    $api->group(['prefix' => 'menu'], function ($api) {
+        $api->get('/', [
+            'as' => 'menu.menu',
+            'uses' => 'App\Http\Controllers\MenuController@menu',
+        ]);
+
+        $api->get('/grouped/{option}', [
+            'as' => 'menu.grouped',
+            'uses' => 'App\Http\Controllers\MenuController@grouped',
+        ]);
+
+        $api->get('/products/category/{category}', [
+            'as' => 'menu.product',
+            'uses' => 'App\Http\Controllers\MenuController@category',
+        ]);
+    });
+
+    $api->group(['prefix' => 'checkout'], function ($api) {
+        $api->get('/board/{id}', [
+            'as' => 'checkout.board',
+            'uses' => 'App\Http\Controllers\CheckoutController@board',
+        ]);
+
+        $api->post('/board/{id}', [
+            'as' => 'checkout.board',
+            'uses' => 'App\Http\Controllers\CheckoutController@request',
+        ]);
+
+        $api->put('/board/{id}', [
+            'as' => 'checkout.board',
+            'uses' => 'App\Http\Controllers\CheckoutController@update',
+        ]);
+    });
+
 });
 
-Route::group(['prefix' => 'api', 'middleware' => ['api']], function () {
-    Route::group(['prefix' => 'menu'], function () {
-        Route::get('/', 'MenuController@menu')->name('_get_menu');
-        Route::get('/grouped/{option}', 'MenuController@grouped')->name('_get_menu_grouped');
-        Route::get('/products/category/{categoryId}', 'MenuController@category')->name('_get_menu_by_category');
-    });
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('category.index');
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('category.show', ['id']);
 
-    Route::group(['prefix' => 'category'], function () {
-        Route::get('/', 'CategoryController@index')->name('_get_categories');
-        Route::get('/{id}', 'CategoryController@show')->name('_get_category');
-    });
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('opinion.index');
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('opinion.index');
 
-    Route::group(['prefix' => 'opinion'], function () {
-        Route::get('/', 'OpinionController@index')->name('_get_opinions');
-        Route::post('/', 'OpinionController@create')->name('_post_opinion');
-    });
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.index');
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.show', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.ingredient', ['id']);
 
-    Route::group(['prefix' => 'product'], function () {
-        Route::get('/', 'ProductController@index')->name('_get_products');
-        Route::get('/{id}', 'ProductController@show')->name('_get_product');
-    });
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.open', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.close', ['id']);
 
-    Route::group(['prefix' => 'board'], function () {
-        Route::get('/{id}/open', 'BoardController@open')->name('_open_board');
-        Route::get('/{id}/close', 'BoardController@close')->name('_close_board');
-    });
-    
-    Route::group(['prefix' => 'checkout'], function () {
-        Route::get('/board/{id}', 'CheckoutController@board')->name('_get_checkout_board');
-        Route::post('/board/{id}', 'CheckoutController@request')->name('_request_checkout_board');
-        Route::put('/board/{id}', 'CheckoutController@update')->name('_update_checkout_board');
-    });
-});
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('menu.menu');
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('menu.grouped', ['option']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('menu.product', ['category']);
+
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('checkout.board', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('checkout.board', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('checkout.board', ['id']);

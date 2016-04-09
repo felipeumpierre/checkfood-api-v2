@@ -5,54 +5,68 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Repositories\CategoryRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 
 class CategoryController extends Controller
 {
     /**
+     * @var CategoryRepository
+     */
+    protected $categoryRepository;
+
+    /**
+     * @param CategoryRepository $categoryRepository
+     */
+    public function __construct(CategoryRepository $categoryRepository)
+    {
+        $this->categoryRepository = $categoryRepository;
+    }
+
+    /**
      * Show all the categories, just `id` and `name`
      *
-     * @param  CategoryRepository $categoryRepository
      * @return string
      */
-    public function index(CategoryRepository $categoryRepository)
+    public function index()
     {
-        return response()->json($categoryRepository->all(['id', 'name']));
+        return Cache::remember('category', Config::get(), function () {
+            return $this->categoryRepository->all([
+                'id',
+                'name'
+            ]);
+        });
     }
 
     /**
      * Show all the details from one category, with the total of products in that category
      *
-     * @param  integer $categoryId
-     * @param  CategoryRepository $categoryRepository
+     * @param  integer $id
      * @return string
      */
-    public function show($categoryId, CategoryRepository $categoryRepository)
+    public function show($id)
     {
-        $category = $categoryRepository->find($categoryId);
-        $category->totalProducts();
-
-        return response()->json($category);
+        return Cache::remember(sprintf('category.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            $category = $this->categoryRepository->find($id);
+            $category->totalProducts();
+        });
     }
 
     /**
      * Create a new category
      *
      * @param  Request $request
-     * @param  CategoryRepository $categoryRepository
      * @return string
      */
-    public function add(Request $request, CategoryRepository $categoryRepository)
+    public function add(Request $request)
     {
         try {
-            $response = $categoryRepository->create($request->all());
+            return $this->categoryRepository->create(
+                $request->all()
+            );
         } catch (\Exception $e) {
-            $response = [
-                'message' => 'An error happened.',
-                'error' => 'UNEXPECTED_ERROR',
-            ];
+            $this->response()->errorInternal('An error happened.');
         }
-
-        return response()->json($response);
     }
 
     /**
@@ -60,27 +74,22 @@ class CategoryController extends Controller
      *
      * @param  integer $id
      * @param  Request $request
-     * @param  CategoryRepository $categoryRepository
      * @return string
      */
-    public function edit($id, Request $request, CategoryRepository $categoryRepository)
+    public function edit($id, Request $request)
     {
-        try {
-            if ($categoryRepository->exists($id)) {
-                $response = $categoryRepository->update($id, $request->all());
-            } else {
-                $response = [
-                    'message' => 'This category not exist.',
-                    'error' => 'NO_RECORD_FOUND',
-                ];
-            }
-        } catch (\Exception $e) {
-            $response = [
-                'message' => 'An error happened.',
-                'error' => 'UNEXPECTED_ERROR',
-            ];
+        $exists = Cache::remember(sprintf('category.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            return $this->categoryRepository->exists($id);
+        });
+
+        if (!$exists) {
+            $this->response()->errorNotFound('This category not exist');
         }
 
-        return response()->json($response);
+        try {
+            return $this->categoryRepository->update($id, $request->all());
+        } catch (\Exception $e) {
+            $this->response()->errorInternal('An error happened');
+        }
     }
 }

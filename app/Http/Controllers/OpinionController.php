@@ -31,15 +31,9 @@ class OpinionController extends Controller
      */
     public function index()
     {
-        $opinion = Cache::remember(
-            'opinions',
-            Config::get('checkfood.cache.main'),
-            function () {
-                return $this->opinionRepository->all();
-            }
-        );
-
-        return Response::json($opinion, 200);
+        return Cache::remember('opinion', Config::get('checkfood.cache.main'), function () {
+            return $this->opinionRepository->all();
+        });
     }
 
     /**
@@ -50,10 +44,8 @@ class OpinionController extends Controller
      */
     public function create(Request $request)
     {
-        return Response::json(
-            $this->opinionRepository->create(
-                $request->all()
-            ), 201
+        return $this->opinionRepository->create(
+            $request->all()
         );
     }
 }

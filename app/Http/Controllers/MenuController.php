@@ -45,18 +45,12 @@ class MenuController extends Controller
      */
     public function menu()
     {
-        $products = Cache::remember(
-            'products.completed',
-            Config::get('checkfood.cache.main'),
-            function () {
-                return $this->productRepository->with([
-                    'category',
-                    'ingredients',
-                ])->all();
-            }
-        );
-
-        return Response::json($products, 200);
+        return Cache::remember('products.completed', Config::get('checkfood.cache.main'), function () {
+            return $this->productRepository->with([
+                'category',
+                'ingredients',
+            ])->all();
+        });
     }
 
     /**
@@ -68,26 +62,17 @@ class MenuController extends Controller
     public function grouped($option)
     {
         if (!in_array($option, $this->groupedOptions)) {
-            return Response::json([
-                'message' => 'Option not supported.',
-                'error' => 'OPTION_INVALID',
-            ], 400);
+            $this->response()->errorNotFound('Option not supported');
         }
 
-        $categories = Cache::remember(
-            sprintf('category.grouped.%s', $option),
-            Config::get('checkfood.cache.main'),
-            function () {
-                return $this->categoryRepository->with([
-                    'products'
-                ])->all([
-                    'id',
-                    'name',
-                ]);
-            }
-        );
-
-        return Response::json($categories, 200);
+        return Cache::remember(sprintf('category.grouped.%s', $option), Config::get('checkfood.cache.main'), function () {
+            return $this->categoryRepository->with([
+                'products',
+            ])->all([
+                'id',
+                'name',
+            ]);
+        });
     }
 
     /**
@@ -98,34 +83,21 @@ class MenuController extends Controller
      */
     public function category($id)
     {
-        $exists = Cache::remember(
-            sprintf('category.%d', $id),
-            Config::get('checkfood.cache.main'),
-            function () use ($id) {
-                return $this->categoryRepository->exists($id);
-            }
-        );
+        $exists = Cache::remember(sprintf('category.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            return $this->categoryRepository->exists($id);
+        });
 
         if (!$exists) {
-            return Response::json([
-                'message' => 'This category not exist.',
-                'error' => 'NO_RECORD_FOUND',
-            ], 400);
+            $this->response()->errorNotFound('This category not exist');
         }
 
-        $products = Cache::remember(
-            sprintf('category.%d.products', $id),
-            Config::get('checkfood.cache.main'),
-            function () use ($id) {
-                return $this->productRepository->findByField('categories_id', $id)->all([
-                    'id',
-                    'name',
-                    'description',
-                    'price',
-                ]);
-            }
-        );
-
-        return Response::json($products, 200);
+        return Cache::remember(sprintf('category.%d.product', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            return $this->productRepository->findByField('categories_id', $id)->all([
+                'id',
+                'name',
+                'description',
+                'price',
+            ]);
+        });
     }
 }
