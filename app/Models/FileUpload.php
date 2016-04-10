@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class FileUpload extends Model
 {
+    /**
+     * @var array
+     */
     protected $fillable = [
         'name',
     ];
