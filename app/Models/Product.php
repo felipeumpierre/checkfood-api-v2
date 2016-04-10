@@ -47,6 +47,6 @@ class Product extends Model
      */
     public function ingredients()
     {
-        return $this->belongsToMany(Ingredient::class, 'products_ingredients', 'products_id', 'ingredients_id')->select('name');
+        return $this->belongsToMany(Ingredient::class, 'products_ingredients', 'products_id', 'ingredients_id')->withTimestamps()->select('name');
     }
 }
