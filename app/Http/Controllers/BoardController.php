@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\BoardRepository;
 use App\Http\Requests;
+use Dingo\Api\Http\Response;
+use App\Repositories\BoardRepository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
@@ -23,23 +24,6 @@ class BoardController extends Controller
     }
 
     /**
-     * Validation to check if the board exists
-     *
-     * @param  integer $id
-     * @return string
-     */
-    protected function boardExists($id)
-    {
-        $exists = Cache::remember(sprintf('board.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
-            return $this->boardRepository->exists($id);
-        });
-
-        if (!$exists) {
-            $this->response()->errorNotFound('This board not exists');
-        }
-    }
-
-    /**
      * Function to set a table as used
      *
      * @param  integer $id
@@ -47,7 +31,7 @@ class BoardController extends Controller
      */
     public function open($id)
     {
-        $this->handle($id, 2);
+        $this->handleUpdate($id, 2);
     }
 
     /**
@@ -58,17 +42,23 @@ class BoardController extends Controller
      */
     public function close($id)
     {
-        $this->handle($id, 1);
+        $this->handleUpdate($id, 1);
     }
 
     /**
      * @param  integer $id
      * @param  integer $status
-     * @return mixed
+     * @return Response
      */
-    protected function handle($id, $status)
+    protected function handleUpdate($id, $status)
     {
-        $this->boardExists($id);
+        $exists = Cache::remember(sprintf('board.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
+            return $this->boardRepository->exists($id);
+        });
+
+        if (!$exists) {
+            $this->response()->errorNotFound('This board not exists');
+        }
 
         try {
             return $this->boardRepository->update($id, [

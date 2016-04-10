@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use Dingo\Api\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Services\Traits\ProductTrait;
 use Illuminate\Support\Facades\Config;
 use App\Repositories\ProductRepository;
 use App\Services\Traits\IngredientTraits;
@@ -12,7 +14,7 @@ use App\Repositories\IngredientRepository;
 
 class ProductController extends Controller
 {
-    use IngredientTraits;
+    use IngredientTraits, ProductTrait;
 
     /**
      * @var ProductRepository
@@ -37,7 +39,7 @@ class ProductController extends Controller
     /**
      * Show the products with category
      *
-     * @return mixed
+     * @return Response
      */
     public function index()
     {
@@ -52,17 +54,11 @@ class ProductController extends Controller
      * Show product with category
      *
      * @param  integer $id
-     * @return mixed
+     * @return Response
      */
     public function show($id)
     {
-        $exists = Cache::remember(sprintf('product.exists.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
-            return $this->productRepository->exists($id);
-        });
-
-        if (!$exists) {
-            $this->response()->errorNotFound('Product not found');
-        }
+        $this->productExists($id, $this->productRepository, $this->response());
 
         return Cache::remember(sprintf('product.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
             return $this->productRepository->with([
@@ -79,16 +75,17 @@ class ProductController extends Controller
      */
     public function ingredients($id)
     {
-        return Cache::remember(sprintf('product.ingredients.%d', $id), Config::get('checkfood.cache.main'), function () use ($id) {
-            return $this->productRepository->find($id)->ingredients()->get();
-        });
+        return Cache::remember(sprintf('product.ingredients.%d', $id), Config::get('checkfood.cache.main'),
+            function () use ($id) {
+                return $this->productRepository->find($id)->ingredients()->get();
+            });
     }
 
     /**
      * Create a new product
      *
      * @param  Request $request
-     * @return string
+     * @return Response
      */
     public function save(Request $request)
     {
@@ -108,7 +105,7 @@ class ProductController extends Controller
      *
      * @param  integer $id
      * @param  Request $request
-     * @return string
+     * @return Response
      */
     public function edit($id, Request $request)
     {
@@ -124,20 +121,19 @@ class ProductController extends Controller
     }
 
     /**
+     * Delete a product
+     *
      * @param  integer $id
-     * @return string
+     * @return Response
      */
     public function delete($id)
     {
-        // TODO: delete product
-    }
+        try {
+            $this->productRepository->delete($id);
 
-    /**
-     * @param  string $keyword
-     * @return string
-     */
-    public function search($keyword)
-    {
-        // TODO: search products
+            return $this->response()->noContent();
+        } catch (\Exception $e) {
+            $this->response()->errorInternal();
+        }
     }
 }

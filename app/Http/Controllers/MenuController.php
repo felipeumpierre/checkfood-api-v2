@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\CategoryRepository;
-use App\Repositories\ProductRepository;
 use App\Http\Requests;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Config;
+use App\Repositories\ProductRepository;
+use App\Repositories\CategoryRepository;
 
 class MenuController extends Controller
 {

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
-use App\Repositories\CategoryRepository;
+use Dingo\Api\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use App\Repositories\CategoryRepository;
 
 class CategoryController extends Controller
 {
@@ -26,11 +27,11 @@ class CategoryController extends Controller
     /**
      * Show all the categories, just `id` and `name`
      *
-     * @return string
+     * @return Response
      */
     public function index()
     {
-        return Cache::remember('category', Config::get(), function () {
+        return Cache::remember('category', Config::get('checkfood.cache.main'), function () {
             return $this->categoryRepository->all([
                 'id',
                 'name'
@@ -42,7 +43,7 @@ class CategoryController extends Controller
      * Show all the details from one category, with the total of products in that category
      *
      * @param  integer $id
-     * @return string
+     * @return Response
      */
     public function show($id)
     {
@@ -56,14 +57,12 @@ class CategoryController extends Controller
      * Create a new category
      *
      * @param  Request $request
-     * @return string
+     * @return Response
      */
     public function add(Request $request)
     {
         try {
-            return $this->categoryRepository->create(
-                $request->all()
-            );
+            return $this->categoryRepository->create($request->all());
         } catch (\Exception $e) {
             $this->response()->errorInternal('An error happened.');
         }
@@ -74,7 +73,7 @@ class CategoryController extends Controller
      *
      * @param  integer $id
      * @param  Request $request
-     * @return string
+     * @return Response
      */
     public function edit($id, Request $request)
     {

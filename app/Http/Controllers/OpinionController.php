@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\OpinionRepository;
 use App\Http\Requests;
+use Dingo\Api\Http\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Config;
+use App\Repositories\OpinionRepository;
 
 class OpinionController extends Controller
 {
@@ -27,7 +27,7 @@ class OpinionController extends Controller
     /**
      * Show all the opinions
      *
-     * @return string
+     * @return Response
      */
     public function index()
     {
@@ -40,12 +40,14 @@ class OpinionController extends Controller
      * Insert a new opinion
      *
      * @param  Request $request
-     * @return string
+     * @return Response
      */
     public function create(Request $request)
     {
-        return $this->opinionRepository->create(
-            $request->all()
-        );
+        try {
+            return $this->opinionRepository->create($request->all());
+        } catch (\Exception $e) {
+            $this->response()->errorInternal();
+        }
     }
 }
