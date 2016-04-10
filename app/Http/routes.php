@@ -51,11 +51,18 @@ $api->version('v2', function ($api) {
         $api->post('/save', [
             'as' => 'product.save',
             'uses' => 'App\Http\Controllers\ProductController@save',
+            'middleware' => 'api.product',
         ]);
 
         $api->put('/{id}/edit', [
             'as' => 'product.edit',
             'uses' => 'App\Http\Controllers\ProductController@edit',
+            'middleware' => 'api.product',
+        ]);
+
+        $api->delete('/{id}/delete', [
+            'as' => 'product.delete',
+            'uses' => 'App\Http\Controllers\ProductController@delete',
         ]);
     });
 
@@ -118,6 +125,7 @@ app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.show', ['id
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.ingredient', ['id']);
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.save');
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.edit', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.delete', ['id']);
 
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.open', ['id']);
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.close', ['id']);
