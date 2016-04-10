@@ -2,32 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\IngredientRepository;
-use App\Repositories\ProductRepository;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use App\Repositories\ProductRepository;
+use App\Services\Traits\IngredientTraits;
+use App\Repositories\IngredientRepository;
 
 class ProductController extends Controller
 {
+    use IngredientTraits;
+
     /**
      * @var ProductRepository
      */
     protected $productRepository;
 
     /**
-     * @param ProductRepository $productRepository
+     * @var IngredientRepository
      */
-    public function __construct(ProductRepository $productRepository)
+    protected $ingredientRepository;
+
+    /**
+     * @param  ProductRepository $productRepository
+     * @param  IngredientRepository $ingredientRepository
+     */
+    public function __construct(ProductRepository $productRepository, IngredientRepository $ingredientRepository)
     {
         $this->productRepository = $productRepository;
+        $this->ingredientRepository = $ingredientRepository;
     }
 
     /**
      * Show the products with category
      *
-     * @return string
+     * @return mixed
      */
     public function index()
     {
@@ -42,7 +52,7 @@ class ProductController extends Controller
      * Show product with category
      *
      * @param  integer $id
-     * @return string
+     * @return mixed
      */
     public function show($id)
     {
@@ -80,23 +90,37 @@ class ProductController extends Controller
      * @param  Request $request
      * @return string
      */
-    public function add(Request $request)
+    public function save(Request $request)
     {
         try {
-            return $this->productRepository->create($request->all());
+            $product = $this->productRepository->create($request->all());
+
+            $this->addIngredientsToProduct($product, $request);
+
+            return $product;
         } catch (\Exception $e) {
             $this->response()->errorInternal();
         }
     }
 
     /**
+     * Edit a product
+     *
      * @param  integer $id
      * @param  Request $request
      * @return string
      */
     public function edit($id, Request $request)
     {
-        // TODO: edit product
+        try {
+            $product = $this->productRepository->update($id, $request->all());
+
+            $this->addIngredientsToProduct($product, $request);
+
+            return $product;
+        } catch (\Exception $e) {
+            $this->response()->errorInternal();
+        }
     }
 
     /**

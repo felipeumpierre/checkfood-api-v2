@@ -13,6 +13,9 @@ class Ingredient extends Model
         'name',
     ];
 
+    /**
+     * @var array
+     */
     protected $hidden = [
         'pivot'  
     ];

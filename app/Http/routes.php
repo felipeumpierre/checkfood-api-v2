@@ -47,6 +47,16 @@ $api->version('v2', function ($api) {
             'as' => 'product.ingredient',
             'uses' => 'App\Http\Controllers\ProductController@ingredients',
         ]);
+
+        $api->post('/save', [
+            'as' => 'product.save',
+            'uses' => 'App\Http\Controllers\ProductController@save',
+        ]);
+
+        $api->put('/{id}/edit', [
+            'as' => 'product.edit',
+            'uses' => 'App\Http\Controllers\ProductController@edit',
+        ]);
     });
 
     $api->group(['prefix' => 'board'], function ($api) {
@@ -106,6 +116,8 @@ app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('opinion.index');
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.index');
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.show', ['id']);
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.ingredient', ['id']);
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.save');
+app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('product.edit', ['id']);
 
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.open', ['id']);
 app('Dingo\Api\Routing\UrlGenerator')->version('v2')->route('board.close', ['id']);
