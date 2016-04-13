@@ -13,4 +13,12 @@ class Opinion extends Model
         'grade',
         'opinion',
     ];
+
+    /**
+     * @var array
+     */
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 }

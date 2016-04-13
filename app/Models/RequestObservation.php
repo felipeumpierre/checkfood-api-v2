@@ -9,7 +9,15 @@ class RequestObservation extends Model
     /**
      * @var array
      */
-    protected $fillable = ['request_products_id', 'observation'];
+    protected $fillable = [
+        'request_products_id',
+        'observation',
+    ];
+
+    /**
+     * @var string
+     */
+    protected $table = 'requests_observation';
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
