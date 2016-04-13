@@ -98,12 +98,13 @@ $api->version('v2', function ($api) {
     $api->group(['prefix' => 'checkout'], function ($api) {
         $api->get('/board/{id}', [
             'as' => 'checkout.board',
-            'uses' => 'App\Http\Controllers\CheckoutController@board',
+            'uses' => 'App\Http\Controllers\CheckoutController@show',
         ]);
 
         $api->post('/board/{id}', [
             'as' => 'checkout.board',
-            'uses' => 'App\Http\Controllers\CheckoutController@request',
+            'uses' => 'App\Http\Controllers\CheckoutController@save',
+            'middleware' => 'api.checkout'
         ]);
 
         $api->put('/board/{id}', [
