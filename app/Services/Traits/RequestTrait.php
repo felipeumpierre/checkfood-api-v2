@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 trait RequestTrait
 {
     /**
+     * Add products to a request
+     *
      * @param  Request $request
      * @param  Model $model
      * @param  ProductRepository $productRepository
@@ -33,6 +35,8 @@ trait RequestTrait
     }
 
     /**
+     * Add observation to a product request
+     *
      * @param  Request $request
      * @param  Model $model
      */
