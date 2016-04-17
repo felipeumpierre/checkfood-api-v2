@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "aaronjan/housekeeper",
-            "version": "2.1.8-beta",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/AaronJan/Housekeeper.git",
-                "reference": "4ec14b050a76866ec95ce899e040d5f5345d5471"
+                "reference": "e190729a8ddfcdd2aea0c03c3e96e198b0f8645f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/AaronJan/Housekeeper/zipball/b7ec2ed50c2a918eca3bab0df1c56b66e86f52b4",
-                "reference": "4ec14b050a76866ec95ce899e040d5f5345d5471",
+                "url": "https://api.github.com/repos/AaronJan/Housekeeper/zipball/e190729a8ddfcdd2aea0c03c3e96e198b0f8645f",
+                "reference": "e190729a8ddfcdd2aea0c03c3e96e198b0f8645f",
                 "shasum": ""
             },
             "require": {
@@ -51,7 +51,7 @@
                 "laravel",
                 "repository"
             ],
-            "time": "2016-03-16 15:59:54"
+            "time": "2016-04-15 03:22:10"
         },
         {
             "name": "barryvdh/laravel-ide-helper",
